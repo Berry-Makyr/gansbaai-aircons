@@ -30,5 +30,11 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "src/sanity/schemaTypes/authorType.ts",
+    "src/sanity/schemaTypes/postType.ts",
+    "src/sanity/schemaTypes/categoryType.ts",
+    "src/sanity/schemaTypes/blockContentType.ts"
+  ]
 }

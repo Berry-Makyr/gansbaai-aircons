@@ -1,12 +1,26 @@
 import { parseBody } from "next-sanity/webhook";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
+
+type WebhookPayload = {
+  _type?: string;
+};
 
 export async function POST(req: NextRequest) {
   try {
-    const { body, isValidSignature } = await parseBody(
+    const secret = process.env.SANITY_REVALIDATE_SECRET;
+    if (!secret) {
+      return new Response(
+        "Missing environment variable SANITY_REVALIDATE_SECRET",
+        { status: 500 }
+      );
+    }
+
+    // Wait briefly so CDN/API propagation completes before the next fetch.
+    const { body, isValidSignature } = await parseBody<WebhookPayload>(
       req,
-      process.env.SANITY_REVALIDATE_SECRET
+      secret,
+      true
     );
 
     if (!isValidSignature) {
@@ -17,9 +31,9 @@ export async function POST(req: NextRequest) {
       return new Response("Bad Request", { status: 400 });
     }
 
-    // Revalidate the specific document type tag
-    // @ts-expect-error Next.js 16 type definitions might require a second argument that is not strictly needed at runtime
-    revalidateTag(body._type);
+    revalidateTag(body._type, "max");
+    revalidateTag("homepage", "max");
+    revalidatePath("/", "layout");
 
     return NextResponse.json({
       status: 200,
@@ -27,8 +41,9 @@ export async function POST(req: NextRequest) {
       now: Date.now(),
       body,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error";
     console.error(err);
-    return new Response(err.message, { status: 500 });
+    return new Response(message, { status: 500 });
   }
 }

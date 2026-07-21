@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:clean": "node -e \"const fs=require('fs');const p='.next';try{fs.rmSync(p,{recursive:true,force:true});console.log('Removed .next')}catch(e){console.error(e.message);process.exit(1)}\" && next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "node scripts/seed-sanity.mjs"
   },
   "dependencies": {
     "@sanity/client": "^7.23.0",

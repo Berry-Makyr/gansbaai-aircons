@@ -1,15 +1,46 @@
-import type {StructureResolver} from 'sanity/structure'
+import type { StructureResolver } from "sanity/structure";
 
-// https://www.sanity.io/docs/structure-builder-cheat-sheet
+const singletonId = (typeName: string) => typeName;
+
+const singletonListItem = (
+  S: Parameters<StructureResolver>[0],
+  typeName: string,
+  title: string
+) =>
+  S.listItem()
+    .title(title)
+    .id(typeName)
+    .child(S.document().schemaType(typeName).documentId(singletonId(typeName)));
+
 export const structure: StructureResolver = (S) =>
   S.list()
-    .title('Blog')
+    .title("Website Content")
     .items([
-      S.documentTypeListItem('post').title('Posts'),
-      S.documentTypeListItem('category').title('Categories'),
-      S.documentTypeListItem('author').title('Authors'),
+      S.listItem()
+        .title("Business Details")
+        .child(
+          S.list()
+            .title("Business Details")
+            .items([singletonListItem(S, "siteSettings", "Contact & Settings")])
+        ),
       S.divider(),
-      ...S.documentTypeListItems().filter(
-        (item) => item.getId() && !['post', 'category', 'author'].includes(item.getId()!),
-      ),
-    ])
+      S.listItem()
+        .title("Homepage Sections")
+        .child(
+          S.list()
+            .title("Homepage Sections")
+            .items([
+              singletonListItem(S, "hero", "Hero"),
+              singletonListItem(S, "whyChooseUs", "Why Choose Us"),
+              singletonListItem(S, "communityOutreach", "Community Outreach"),
+              singletonListItem(S, "legacy", "Our Legacy"),
+              singletonListItem(S, "dealersSection", "Approved Dealers"),
+              singletonListItem(S, "reviewsSection", "Customer Reviews"),
+            ])
+        ),
+      S.divider(),
+      S.documentTypeListItem("enquiry").title("Website Enquiries"),
+      S.divider(),
+      S.documentTypeListItem("service").title("Services"),
+      S.documentTypeListItem("galleryImage").title("Gallery Images"),
+    ]);

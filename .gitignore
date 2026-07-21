@@ -15,10 +15,13 @@
 
 # next.js
 /.next/
+/.next.locked-*/
 /out/
 
 # production
 /build
+/dist/
+/.sanity/
 
 # misc
 .DS_Store
@@ -39,3 +42,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel

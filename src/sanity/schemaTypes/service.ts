@@ -1,4 +1,5 @@
 import { defineField, defineType } from "sanity";
+import { serviceIconList } from "./objects";
 
 export const serviceType = defineType({
   name: "service",
@@ -15,10 +16,7 @@ export const serviceType = defineType({
       name: "slug",
       title: "Slug",
       type: "slug",
-      options: {
-        source: "title",
-        maxLength: 96,
-      },
+      options: { source: "title", maxLength: 96 },
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -28,18 +26,30 @@ export const serviceType = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: "iconName",
+      title: "Icon",
+      type: "string",
+      options: { list: [...serviceIconList] },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
       name: "icon",
-      title: "Service Image/Icon",
+      title: "Optional Custom Image",
       type: "image",
-      options: {
-        hotspot: true,
-      },
+      description: "Optional. Leave empty to use the selected icon above.",
+      options: { hotspot: true },
     }),
     defineField({
       name: "order",
       title: "Display Order",
       type: "number",
-      description: "Order in which this service appears on the home page (e.g. 1, 2, 3)",
+      description: "Lower numbers appear first on the homepage.",
     }),
   ],
+  orderings: [
+    { title: "Display Order", name: "orderAsc", by: [{ field: "order", direction: "asc" }] },
+  ],
+  preview: {
+    select: { title: "title", subtitle: "description", media: "icon" },
+  },
 });
