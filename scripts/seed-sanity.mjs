@@ -78,7 +78,14 @@ async function uploadImage(relativePath) {
   return ref;
 }
 
-async function seedSingleton(id, doc) {
+async function seedSingleton(id, doc, { preserveIfExists = false } = {}) {
+  if (preserveIfExists) {
+    const existing = await client.fetch(`*[_id == $id][0]._id`, { id });
+    if (existing) {
+      console.log(`↷ ${id} (kept existing CMS content)`);
+      return;
+    }
+  }
   await client.createOrReplace({ _id: id, _type: doc._type, ...doc });
   console.log(`✓ ${id}`);
 }
@@ -141,18 +148,22 @@ async function main() {
   });
 
   const heroImage = await uploadImage("/gallery/gallery-12.jpg");
-  await seedSingleton("hero", {
-    _type: "hero",
-    badgeText: "Serving Overberg & Overstrand",
-    headlinePrefix: "Gansbaai",
-    tagline: "Regulating The Temperature Since 2005",
-    description:
-      "Family-run since 2005, Gansbaai Aircon & Refrigeration CC installs, services and repairs air-conditioning and refrigeration systems for homes, businesses and farms throughout the Overberg.",
-    quoteCtaText: "Request a Quote",
-    backgroundImage: heroImage,
-    backgroundImageAlt:
-      "Gansbaai Aircon technicians servicing commercial air conditioning units",
-  });
+  await seedSingleton(
+    "hero",
+    {
+      _type: "hero",
+      badgeText: "Serving Overberg & Overstrand",
+      headlinePrefix: "Gansbaai",
+      tagline: "Regulating The Temperature Since 2005",
+      description:
+        "The Leading Air Conditioning & Refrigeration Specialists in the Overstrand & Overberg.\nFor over 20 years, Gansbaai Aircon & Refrigeration has been a trusted name in climate control and refrigeration, delivering innovative solutions backed by technical expertise, quality craftsmanship, and exceptional customer service. \nWe specialize in the design, supply, installation, servicing, and maintenance of residential, commercial, and industrial systems, ensuring every solution is tailored for maximum performance, efficiency, and reliability.",
+      quoteCtaText: "Request a Quote",
+      backgroundImage: heroImage,
+      backgroundImageAlt:
+        "Gansbaai Aircon technicians servicing commercial air conditioning units",
+    },
+    { preserveIfExists: true }
+  );
 
   await seedSingleton("whyChooseUs", {
     _type: "whyChooseUs",
@@ -177,25 +188,33 @@ async function main() {
   const g15 = await uploadImage("/gallery/gallery-15.jpg");
   const g16 = await uploadImage("/gallery/gallery-16.jpg");
 
-  await seedSingleton("communityOutreach", {
-    _type: "communityOutreach",
-    eyebrow: "Community Outreach",
-    title: "Reach for Recovery — Breast Cancer Fundraiser",
-    description:
-      "As a local family business, we believe in supporting the community that supports us.",
-    message:
-      "PLACEHOLDER: Complete approved fundraiser message — edit this in Studio with the full Reach for Recovery narrative.",
-    closingLine: "Together, we've not only cooled homes—we've warmed hearts.",
-    hashtags: ["#ReachForRecovery", "#BreastCancerAwarenessMonth", "#Gansbaai"],
-    featuredImage: featured,
-    featuredImageAlt:
-      "Gansbaai Aircon team supporting the Reach for Recovery breast cancer fundraiser",
-    galleryImages: [g13, g14, g15, g16].filter(Boolean).map((img, i) => ({
-      ...img,
-      _key: `cg${i}`,
-      alt: `Reach for Recovery fundraiser photo ${i + 1}`,
-    })),
-  });
+  await seedSingleton(
+    "communityOutreach",
+    {
+      _type: "communityOutreach",
+      eyebrow: "Community Outreach",
+      title: "Reach for Recovery — Breast Cancer Fundraiser",
+      description:
+        "As a local family business, we believe in supporting the community that supports us.",
+      message:
+        "🎀 Thank You for Making a Difference! 💖\n\nAs we officially close our Reach for Recovery (R4R) Breast Cancer Fundraiser, we want to take a moment to say a heartfelt thank you to everyone who supported this meaningful cause. 💕\n\nThroughout this campaign, we pledged to donate R250 from every aircon purchase and installation — and thanks to your incredible support, we’ve proudly contributed towards helping women on their journey through breast cancer recovery. \n\nYour kindness, encouragement, and willingness to give back have truly made a difference. Every purchase, every share, every word of support mattered — and together, we’ve shown what community and compassion can achieve. 💪\n\nFrom our entire team — thank you for standing with us, supporting Reach for Recovery, and spreading awareness for such an important cause.",
+      closingLine: "Together, we've not only cooled homes—we've warmed hearts.",
+      hashtags: [
+        "#ReachForRecovery",
+        "#BreastCancerAwarenessMonth",
+        "#Gansbaai",
+      ],
+      featuredImage: featured,
+      featuredImageAlt:
+        "Gansbaai Aircon team supporting the Reach for Recovery breast cancer fundraiser",
+      galleryImages: [g13, g14, g15, g16].filter(Boolean).map((img, i) => ({
+        ...img,
+        _key: `cg${i}`,
+        alt: `Reach for Recovery fundraiser photo ${i + 1}`,
+      })),
+    },
+    { preserveIfExists: true }
+  );
 
   await seedSingleton("legacy", {
     _type: "legacy",

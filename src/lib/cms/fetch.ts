@@ -136,7 +136,8 @@ function defaultHero(): HeroContent {
     badgeText: `Serving ${business.serviceArea}`,
     headlinePrefix: "Gansbaai",
     tagline: business.tagline,
-    description: `Family-run since 2005, ${business.name} installs, services and repairs air-conditioning and refrigeration systems for homes, businesses and farms throughout the Overberg.`,
+    description:
+      "The Leading Air Conditioning & Refrigeration Specialists in the Overstrand & Overberg.\nFor over 20 years, Gansbaai Aircon & Refrigeration has been a trusted name in climate control and refrigeration, delivering innovative solutions backed by technical expertise, quality craftsmanship, and exceptional customer service. \nWe specialize in the design, supply, installation, servicing, and maintenance of residential, commercial, and industrial systems, ensuring every solution is tailored for maximum performance, efficiency, and reliability.",
     quoteCtaText: "Request a Quote",
     backgroundImage: HERO_IMAGE,
     backgroundImageAlt:
