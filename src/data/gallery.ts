@@ -1,14 +1,46 @@
 export const HERO_IMAGE = "/gallery/gallery-12.jpg";
 
 export type GalleryCategory =
+  | "Air Conditioning"
   | "Installation"
   | "Maintenance"
   | "Commercial"
   | "Refrigeration"
+  | "Cold Rooms"
+  | "Marine"
   | "Repairs"
   | "Service"
   | "Community"
   | "Promotional";
+
+/** Preferred homepage category order (only non-empty groups are shown). */
+export const galleryCategoryOrder: GalleryCategory[] = [
+  "Air Conditioning",
+  "Installation",
+  "Refrigeration",
+  "Cold Rooms",
+  "Marine",
+  "Commercial",
+  "Repairs",
+  "Maintenance",
+  "Service",
+  "Community",
+  "Promotional",
+];
+
+export const galleryCategoryLabels: Record<GalleryCategory, string> = {
+  "Air Conditioning": "Air Conditioning",
+  Installation: "Installations",
+  Refrigeration: "Refrigeration",
+  "Cold Rooms": "Cold Rooms",
+  Marine: "Marine / Fishing Vessels",
+  Commercial: "Commercial",
+  Repairs: "Repairs",
+  Maintenance: "Maintenance",
+  Service: "Service",
+  Community: "Community Outreach",
+  Promotional: "Promotional",
+};
 
 export type GalleryItem = {
   id: number;

@@ -193,7 +193,7 @@ export default function AirconLogoText({ idPrefix }: AirconLogoTextProps) {
 
   return (
     <svg
-      viewBox={`0 0 ${AIRCON_PACKED_WIDTH} 230`}
+      viewBox={`0 40 ${AIRCON_PACKED_WIDTH} 190`}
       className="brand-aircon-svg"
       aria-hidden="true"
       focusable="false"

@@ -41,6 +41,8 @@ export type HeroContent = {
   quoteCtaText: string;
   backgroundImage: CmsImage | string;
   backgroundImageAlt: string;
+  mobileBackgroundImage: CmsImage | string;
+  mobileBackgroundImageAlt: string;
 };
 
 export type SectionHeadingContent = {

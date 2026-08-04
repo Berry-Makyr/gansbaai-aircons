@@ -11,7 +11,8 @@ export type ServiceItem = {
     | "shield"
     | "wind"
     | "flame"
-    | "milk";
+    | "milk"
+    | "ship";
 };
 
 export const services: ServiceItem[] = [
@@ -84,6 +85,13 @@ export const services: ServiceItem[] = [
     description:
       "Milk tank installation, repairs and service contracts that help dairy farms keep storage temperatures dependable.",
     iconName: "milk",
+  },
+  {
+    id: "fishing-vessel",
+    title: "Fishing Vessel Refrigeration & Freezers",
+    description:
+      "Marine refrigeration and freezer systems for fishing vessels, from installation and repairs to ongoing servicing at sea and ashore.",
+    iconName: "ship",
   },
 ];
 

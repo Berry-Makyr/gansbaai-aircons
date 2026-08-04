@@ -20,8 +20,9 @@ export default function FloatingActions({ siteSettings }: FloatingActionsProps) 
 
   useEffect(() => {
     const updateVisibility = () => {
+      // Show early on mobile so first-viewport visitors can still convert.
       setIsVisible(
-        window.innerWidth >= 640 || window.scrollY > window.innerHeight * 0.55
+        window.innerWidth >= 640 || window.scrollY > window.innerHeight * 0.12
       );
     };
 

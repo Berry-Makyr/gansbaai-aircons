@@ -80,13 +80,16 @@ export const reviewItem = defineType({
 });
 
 export const galleryCategoryList = [
-  { title: "Installation", value: "Installation" },
-  { title: "Maintenance", value: "Maintenance" },
-  { title: "Commercial", value: "Commercial" },
+  { title: "Air Conditioning", value: "Air Conditioning" },
+  { title: "Installations", value: "Installation" },
   { title: "Refrigeration", value: "Refrigeration" },
+  { title: "Cold Rooms", value: "Cold Rooms" },
+  { title: "Marine / Fishing Vessels", value: "Marine" },
+  { title: "Commercial", value: "Commercial" },
   { title: "Repairs", value: "Repairs" },
+  { title: "Maintenance", value: "Maintenance" },
   { title: "Service", value: "Service" },
-  { title: "Community", value: "Community" },
+  { title: "Community Outreach", value: "Community" },
   { title: "Promotional", value: "Promotional" },
 ] as const;
 
@@ -100,4 +103,5 @@ export const serviceIconList = [
   { title: "Wind (Ventilation)", value: "wind" },
   { title: "Flame (Heat Pumps)", value: "flame" },
   { title: "Milk (Dairy)", value: "milk" },
+  { title: "Ship (Fishing Vessel)", value: "ship" },
 ] as const;

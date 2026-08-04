@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
 import { isPlaceholder } from "@/data/business";
 import type { SiteSettingsContent } from "@/lib/cms/types";
@@ -8,12 +8,23 @@ import type { SiteSettingsContent } from "@/lib/cms/types";
 type ContactFormProps = {
   siteSettings: SiteSettingsContent;
   serviceOptions: string[];
+  /** Prefill the service select (e.g. from `?service=`). */
+  defaultService?: string;
 };
 
 export default function ContactForm({
   siteSettings,
   serviceOptions,
+  defaultService,
 }: ContactFormProps) {
+  const initialService = useMemo(() => {
+    if (!defaultService) return "General Inquiry";
+    const match = serviceOptions.find(
+      (option) => option.toLowerCase() === defaultService.toLowerCase()
+    );
+    return match || "General Inquiry";
+  }, [defaultService, serviceOptions]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "success" | "error"
@@ -271,6 +282,7 @@ export default function ContactForm({
                   <select
                     id="service"
                     name="service"
+                    defaultValue={initialService}
                     className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all appearance-none"
                   >
                     <option value="General Inquiry">General Inquiry</option>

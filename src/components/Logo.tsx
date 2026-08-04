@@ -1,4 +1,5 @@
 import AirconLogoText from "@/components/AirconLogoText";
+import RefrigerationLogoText from "@/components/RefrigerationLogoText";
 
 type LogoVariant = "hero" | "footer";
 
@@ -23,8 +24,9 @@ export default function Logo({
       aria-hidden={ariaHidden || undefined}
     >
       <span className="brand-logo__mark">
+        <span className="brand-logo__top">GANSBAAI</span>
         <AirconLogoText idPrefix={variant} />
-        <span className="brand-logo__refrigeration">&amp; REFRIGERATION</span>
+        <RefrigerationLogoText idPrefix={variant} />
       </span>
     </span>
   );

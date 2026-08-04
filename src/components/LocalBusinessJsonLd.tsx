@@ -2,6 +2,7 @@ import type {
   ServiceContent,
   SiteSettingsContent,
 } from "@/lib/cms/types";
+import { SITE_NAME, SITE_URL, absoluteUrl } from "@/lib/site";
 
 type LocalBusinessJsonLdProps = {
   siteSettings: SiteSettingsContent;
@@ -12,16 +13,20 @@ export default function LocalBusinessJsonLd({
   siteSettings,
   services,
 }: LocalBusinessJsonLdProps) {
+  const logoUrl = absoluteUrl("/icon");
+
   const data = {
     "@context": "https://schema.org",
     "@type": "HVACBusiness",
-    "@id": "https://gansbaaiaircon.co.za/#business",
-    name: siteSettings.name,
-    url: "https://gansbaaiaircon.co.za",
+    "@id": `${SITE_URL}/#business`,
+    name: siteSettings.name || SITE_NAME,
+    url: SITE_URL,
     description: siteSettings.seoDescription,
     foundingDate: String(siteSettings.establishedYear),
     telephone: siteSettings.phone.tel,
     email: siteSettings.email,
+    image: logoUrl,
+    logo: logoUrl,
     address: {
       "@type": "PostalAddress",
       streetAddress: siteSettings.address.line1,
@@ -38,9 +43,12 @@ export default function LocalBusinessJsonLd({
     areaServed: [
       { "@type": "AdministrativeArea", name: "Overberg" },
       { "@type": "AdministrativeArea", name: "Overstrand" },
+      { "@type": "AdministrativeArea", name: "Gansbaai" },
     ],
     hasMap: siteSettings.google.mapsOpenUrl,
-    sameAs: [siteSettings.facebook, siteSettings.google.mapsOpenUrl],
+    sameAs: [siteSettings.facebook, siteSettings.google.mapsOpenUrl].filter(
+      Boolean
+    ),
     contactPoint: [
       {
         "@type": "ContactPoint",

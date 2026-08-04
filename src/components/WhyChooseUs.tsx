@@ -36,6 +36,7 @@ export default function WhyChooseUs({ content }: WhyChooseUsProps) {
     <section id="why-us" className="py-24 bg-white" aria-labelledby="why-us-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
+          id="why-us-heading"
           eyebrow={content.eyebrow}
           title={content.title}
           description={content.description}

@@ -27,16 +27,33 @@ export const heroType = defineType({
     }),
     defineField({
       name: "backgroundImage",
-      title: "Background Image",
+      title: "Desktop Background Image",
       type: "image",
+      description:
+        "Hero photo shown on tablet and desktop (md breakpoint and up).",
       options: { hotspot: true },
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "backgroundImageAlt",
-      title: "Background Image Alt Text",
+      title: "Desktop Background Image Alt Text",
       type: "string",
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "mobileBackgroundImage",
+      title: "Mobile Background Image",
+      type: "image",
+      description:
+        "Optional. Hero photo shown on phones. If empty, the desktop image is used.",
+      options: { hotspot: true },
+    }),
+    defineField({
+      name: "mobileBackgroundImageAlt",
+      title: "Mobile Background Image Alt Text",
+      type: "string",
+      description:
+        "Alt text for the mobile hero image. Falls back to the desktop alt text if empty.",
     }),
     defineField({
       name: "quoteCtaText",
@@ -46,6 +63,10 @@ export const heroType = defineType({
     }),
   ],
   preview: {
-    select: { title: "headlinePrefix", subtitle: "tagline", media: "backgroundImage" },
+    select: {
+      title: "headlinePrefix",
+      subtitle: "tagline",
+      media: "backgroundImage",
+    },
   },
 });

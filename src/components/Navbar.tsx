@@ -8,30 +8,41 @@ import type { SiteSettingsContent } from "@/lib/cms/types";
 
 type NavbarProps = {
   siteSettings: SiteSettingsContent;
+  /** `overlay` for the homepage hero; `solid` for inner pages. */
+  variant?: "overlay" | "solid";
 };
 
-export default function Navbar({ siteSettings }: NavbarProps) {
-  const [isScrolled, setIsScrolled] = useState(false);
+export default function Navbar({
+  siteSettings,
+  variant = "overlay",
+}: NavbarProps) {
+  const [isScrolled, setIsScrolled] = useState(variant === "solid");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    if (variant === "solid") {
+      setIsScrolled(true);
+      return;
+    }
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [variant]);
 
   const toggleMenu = () => setIsMobileMenuOpen((prev) => !prev);
   const closeMenu = () => setIsMobileMenuOpen(false);
 
-  const textClass = isScrolled ? "text-slate-800" : "text-white";
-  const linkClass = isScrolled
+  const solid = variant === "solid" || isScrolled;
+  const textClass = solid ? "text-slate-800" : "text-white";
+  const linkClass = solid
     ? "text-slate-700 hover:text-sky-600"
     : "text-slate-100 hover:text-sky-300";
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
+        solid
           ? "bg-white/90 backdrop-blur-md shadow-md py-3"
           : "bg-transparent py-5"
       }`}
