@@ -34,10 +34,12 @@ Google caches favicons separately and can keep an old icon (including the defaul
 
 ## Sanity dataset privacy (enquiry PII)
 
-The `production` dataset is **private** so unauthenticated clients cannot read `enquiry` documents.
+The `production` dataset is **private** so unauthenticated clients cannot read `enquiry` documents **or CMS images/content**.
 
 - Website server reads use `SANITY_API_WRITE_TOKEN` (or optional `SANITY_API_READ_TOKEN`)
 - Studio users still sign in normally
+- **Required on every Vercel environment that should show live CRM content:** `SANITY_API_WRITE_TOKEN` (or `SANITY_API_READ_TOKEN`) must be set for **Production, Preview, and Development**. If Preview is missing the token, the preview site silently falls back to local default images/copy and looks like CRM media was removed — the Sanity documents are still intact.
+- After adding/changing Sanity tokens on Preview, redeploy the preview branch
 - Verify leak is closed:
 
 ```bash

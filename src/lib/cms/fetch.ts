@@ -402,7 +402,22 @@ function mergeHomepage(data: SanityHomepage | null): HomepageContent {
   };
 }
 
+function assertSanityReadAuthConfigured() {
+  const hasToken = Boolean(
+    process.env.SANITY_API_READ_TOKEN?.trim() ||
+      process.env.SANITY_API_WRITE_TOKEN?.trim()
+  );
+  if (!hasToken) {
+    console.error(
+      "[cms] SANITY_API_READ_TOKEN / SANITY_API_WRITE_TOKEN is missing. " +
+        "The Sanity dataset is private — hero/gallery/CRM images will fall back to local defaults. " +
+        "Set the token on this Vercel environment (Preview included) and redeploy."
+    );
+  }
+}
+
 export async function getHomepageContent(): Promise<HomepageContent> {
+  assertSanityReadAuthConfigured();
   try {
     const data = await client.fetch<SanityHomepage | null>(
       HOMEPAGE_QUERY,
