@@ -3,7 +3,7 @@ import SectionHeading from "@/components/SectionHeading";
 
 export default function Faq() {
   return (
-    <section id="faq" className="py-24 bg-white" aria-labelledby="faq-heading">
+    <section id="faq" className="pt-8 pb-24 bg-white" aria-labelledby="faq-heading">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
           id="faq-heading"

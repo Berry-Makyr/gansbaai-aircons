@@ -15,9 +15,9 @@ export const whyChooseUsItems = [
       "Clear advice and fair recommendations\nNeat install and repair finish",
   },
   {
-    title: "Qualified Technicians",
+    title: "Fully Qualified Refrigeration Artisan",
     description:
-      "Experienced install and repair teams\nSupport across major AC and refrigeration brands",
+      "Fully qualified Refrigeration artisan\nSAQCC Gas authorised practitioner standards\nSupport across major AC and refrigeration brands",
   },
   {
     title: "Emergency Breakdown Service",

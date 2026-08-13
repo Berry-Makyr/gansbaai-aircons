@@ -20,6 +20,11 @@ export const faqItems: FaqItem[] = [
       "Absolutely. Send a short description of the job via our enquiry form or WhatsApp and we will advise on the next steps. Site visits can be arranged where needed.",
   },
   {
+    question: "Are you a qualified refrigeration artisan?",
+    answer:
+      "Yes. Work is carried out by a fully qualified Refrigeration artisan, following SAQCC Gas authorised practitioner standards for air conditioning and refrigeration gas work.",
+  },
+  {
     question: "What systems do you install and service?",
     answer:
       "Air conditioning, commercial refrigeration, cold rooms, blast freezers, wine cellar cooling, milk tank refrigeration, heat pumps, ventilation/extraction, car aircon re-gas, marine systems, and coastal rust protection for outdoor units.",

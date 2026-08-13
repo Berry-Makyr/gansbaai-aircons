@@ -62,6 +62,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/services/Fishing-Vessel-Refrigeration-",
+        destination: "/services/fishing-vessel",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

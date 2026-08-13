@@ -351,12 +351,29 @@ function mergeReviews(data?: SanityHomepage["reviewsSection"]): ReviewsSectionCo
   };
 }
 
+function slugifyServiceId(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function resolveServiceId(title?: string, slug?: string): string {
+  const match = defaultServices.find(
+    (service) => service.title.toLowerCase() === title?.trim().toLowerCase()
+  );
+  if (match) return match.id;
+  const candidate = slug || title || "";
+  return slugifyServiceId(candidate);
+}
+
 function mergeServices(data?: SanityHomepage["services"]): ServiceContent[] {
   if (!data?.length) return defaultServices.map((s) => ({ ...s }));
   return data
     .filter((s) => s.title && s.description && s.iconName)
     .map((s) => ({
-      id: s.id ?? s.title!.toLowerCase().replace(/\s+/g, "-"),
+      id: resolveServiceId(s.title, s.id),
       title: s.title!,
       description: s.description!,
       iconName: s.iconName as ServiceContent["iconName"],
@@ -462,11 +479,17 @@ export async function getServiceBySlug(
       { slug },
       { next: { revalidate: 60, tags: ["services", `service-${slug}`] } }
     );
+    const fallback =
+      mergeServices(undefined).find((s) => s.id === slug) ??
+      mergeServices(undefined).find(
+        (s) => slugifyServiceId(s.title) === slugifyServiceId(slug)
+      ) ??
+      null;
     if (!data?.id && !data?.title) {
-      return mergeServices(undefined).find((s) => s.id === slug) ?? null;
+      return fallback;
     }
     const merged = mergeServices([data]);
-    return merged[0] ?? null;
+    return merged[0] ?? fallback;
   } catch (error) {
     console.error("Failed to fetch service, using defaults.", error);
     return mergeServices(undefined).find((s) => s.id === slug) ?? null;
