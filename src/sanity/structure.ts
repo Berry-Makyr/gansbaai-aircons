@@ -39,8 +39,6 @@ export const structure: StructureResolver = (S) =>
             ])
         ),
       S.divider(),
-      S.documentTypeListItem("enquiry").title("Website Enquiries"),
-      S.divider(),
       S.documentTypeListItem("service").title("Services"),
       S.documentTypeListItem("galleryImage").title("Gallery Images"),
       S.divider(),

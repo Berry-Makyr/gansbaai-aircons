@@ -32,20 +32,16 @@ Google caches favicons separately and can keep an old icon (including the defaul
 - Do **not** set canonical/OG/schema to `gansbaaiaircon.co.za`
 - If you own `gansbaaiaircon.co.za`, 301-redirect it to `https://www.gbaircon.co.za`
 
-## Sanity dataset privacy (enquiry PII)
+## Sanity dataset + enquiry PII
 
-The `production` dataset is **private** so unauthenticated clients cannot read `enquiry` documents **or CMS images/content**.
+Preview stores website enquiries in **Neon** (`DATABASE_URL`), not Sanity. Existing Sanity enquiry documents were migrated and deleted.
 
-- Website server reads use `SANITY_API_WRITE_TOKEN` (or optional `SANITY_API_READ_TOKEN`)
-- Studio users still sign in normally
-- **Required on every Vercel environment that should show live CRM content:** `SANITY_API_WRITE_TOKEN` (or `SANITY_API_READ_TOKEN`) must be set for **Production, Preview, and Development**. If Preview is missing the token, the preview site silently falls back to local default images/copy and looks like CRM media was removed — the Sanity documents are still intact.
-- After adding/changing Sanity tokens on Preview, redeploy the preview branch
-- Verify leak is closed:
+Keep the dataset **private** until production is on the same Neon contact form. A public dataset plus the current live form would leak new enquiry PII.
 
-```bash
-# Should fail / unauthorized without a token:
-curl "https://zkwbyr44.api.sanity.io/v2026-07-11/data/query/production?query=*%5B_type%3D%3D%22enquiry%22%5D%5B0%5D%7B_id%2Cemail%7D"
-```
+- Every Vercel environment that should show live CRM images still needs `SANITY_API_WRITE_TOKEN` or `SANITY_API_READ_TOKEN` — including Preview.
+- Studio users still sign in normally. Enquiries and analytics APIs require a Sanity member bearer token.
+- After adding/changing Sanity tokens or `DATABASE_URL` on Preview, redeploy the preview branch
+- After production cutover: make the dataset public and drop the token from the published-content client.
 
 ## Vercel webhook
 

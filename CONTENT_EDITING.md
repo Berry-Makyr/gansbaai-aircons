@@ -110,9 +110,9 @@ Requires `CRON_SECRET` on Vercel (Production). Data already aged out of Vercel b
 
 ## Managing enquiries
 
-Every successful website form submission is saved under **Website Enquiries** in Studio. Open an enquiry to view the customer's contact details and message, update its status, and add private follow-up notes.
+Every successful website form submission is saved in the private Neon **Enquiries** Studio tool (same login). Open an enquiry to view the customer's contact details and message, update its status, and add private follow-up notes. Enquiries are not stored in Sanity.
 
-Email notifications are optional. To enable them, configure a valid `RESEND_API_KEY` and a verified `CONTACT_FROM_EMAIL` in Vercel. Enquiries remain safely stored in Sanity even when an email notification cannot be delivered.
+Email notifications are optional. To enable them, configure a valid `RESEND_API_KEY` and a verified `CONTACT_FROM_EMAIL` in Vercel. Enquiries remain in Neon even when an email notification cannot be delivered.
 
 ## Publishing workflow
 

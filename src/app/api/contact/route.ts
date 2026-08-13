@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { createClient } from "next-sanity";
 import { Resend } from "resend";
 import { z } from "zod";
-import { apiVersion, dataset, projectId } from "@/sanity/env";
+import { insertEnquiry, isEnquiriesDbConfigured } from "@/lib/enquiries";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
@@ -91,11 +90,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const writeToken = process.env.SANITY_API_WRITE_TOKEN;
-    if (!writeToken) {
-      console.error(
-        "Contact Form Error: SANITY_API_WRITE_TOKEN is not configured"
-      );
+    if (!isEnquiriesDbConfigured()) {
+      console.error("Contact Form Error: DATABASE_URL is not configured");
       return NextResponse.json(
         {
           error:
@@ -125,18 +121,7 @@ export async function POST(request: Request) {
     }
 
     const { name, email, phone, service, message } = result.data;
-    const sanity = createClient({
-      projectId,
-      dataset,
-      apiVersion,
-      useCdn: false,
-      token: writeToken,
-    });
-
-    await sanity.create({
-      _type: "enquiry",
-      status: "new",
-      submittedAt: new Date().toISOString(),
+    await insertEnquiry({
       name,
       email,
       phone: phone || "",

@@ -1,5 +1,6 @@
 import { defineField, defineType } from "sanity";
 
+/** Unused after Neon cutover. Kept for rollback only — not registered in schema. */
 export const enquiryType = defineType({
   name: "enquiry",
   title: "Website Enquiry",

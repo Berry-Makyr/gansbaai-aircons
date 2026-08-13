@@ -13,6 +13,7 @@ import {apiVersion, dataset, projectId} from './src/sanity/env'
 import {schema} from './src/sanity/schemaTypes'
 import {structure} from './src/sanity/structure'
 import {analyticsTool} from './src/sanity/tools/analytics'
+import {enquiriesTool} from './src/sanity/tools/enquiries'
 
 export default defineConfig({
   basePath: '/studio',
@@ -26,5 +27,5 @@ export default defineConfig({
     // https://www.sanity.io/docs/the-vision-plugin
     visionTool({defaultApiVersion: apiVersion}),
   ],
-  tools: (prev) => [...prev, analyticsTool()],
+  tools: (prev) => [...prev, analyticsTool(), enquiriesTool()],
 })

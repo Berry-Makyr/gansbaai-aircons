@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useClient } from "sanity";
 import { apiVersion } from "../../env";
 import styles from "./analyticsTool.module.css";
@@ -8,7 +8,7 @@ import styles from "./analyticsTool.module.css";
 type EnquiryStatus = "new" | "contacted" | "completed" | "spam";
 
 type EnquiryRow = {
-  _id: string;
+  id: string;
   name?: string;
   service?: string;
   status?: EnquiryStatus;
@@ -44,12 +44,6 @@ type ArchiveDay = {
   visitors: number;
   pageviews: number;
 };
-
-function daysAgoIso(days: number) {
-  const d = new Date();
-  d.setDate(d.getDate() - days);
-  return d.toISOString();
-}
 
 function formatDate(value?: string) {
   if (!value) return "—";
@@ -132,9 +126,6 @@ export function AnalyticsTool() {
   const [trafficLoading, setTrafficLoading] = useState(true);
   const [rangeDays, setRangeDays] = useState<7 | 14 | 30>(14);
 
-  const since7 = useMemo(() => daysAgoIso(7), []);
-  const since30 = useMemo(() => daysAgoIso(30), []);
-
   useEffect(() => {
     let cancelled = false;
 
@@ -143,57 +134,19 @@ export function AnalyticsTool() {
       setError(null);
 
       try {
-        const result = await client.fetch<{
-          total: number;
-          newCount: number;
-          contacted: number;
-          completed: number;
-          spam: number;
-          last7Days: number;
-          last30Days: number;
-          recent: EnquiryRow[];
-          services: { service?: string }[];
-        }>(
-          `{
-            "total": count(*[_type == "enquiry"]),
-            "newCount": count(*[_type == "enquiry" && status == "new"]),
-            "contacted": count(*[_type == "enquiry" && status == "contacted"]),
-            "completed": count(*[_type == "enquiry" && status == "completed"]),
-            "spam": count(*[_type == "enquiry" && status == "spam"]),
-            "last7Days": count(*[_type == "enquiry" && submittedAt >= $since7]),
-            "last30Days": count(*[_type == "enquiry" && submittedAt >= $since30]),
-            "recent": *[_type == "enquiry"] | order(submittedAt desc) [0...12] {
-              _id, name, service, status, submittedAt
-            },
-            "services": *[_type == "enquiry" && status != "spam" && defined(service)]{ service }
-          }`,
-          { since7, since30 }
-        );
-
-        if (cancelled) return;
-
-        const counts = new Map<string, number>();
-        for (const row of result.services) {
-          const key = (row.service || "General").trim() || "General";
-          counts.set(key, (counts.get(key) || 0) + 1);
-        }
-
-        const byService = [...counts.entries()]
-          .map(([service, count]) => ({ service, count }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 8);
-
-        setStats({
-          total: result.total,
-          newCount: result.newCount,
-          contacted: result.contacted,
-          completed: result.completed,
-          spam: result.spam,
-          last7Days: result.last7Days,
-          last30Days: result.last30Days,
-          recent: result.recent,
-          byService,
+        const token = client.config().token;
+        const response = await fetch("/api/crm/enquiries?stats=1", {
+          credentials: "same-origin",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
+        const result = (await response.json()) as EnquiryStats & {
+          error?: string;
+        };
+        if (!response.ok) {
+          throw new Error(result.error || "Failed to load enquiry stats");
+        }
+        if (cancelled) return;
+        setStats(result);
 
         const archiveRows = await client.fetch<ArchiveDay[]>(
           `*[_type == "analyticsDay"] | order(date desc) [0...120] {
@@ -216,7 +169,7 @@ export function AnalyticsTool() {
     return () => {
       cancelled = true;
     };
-  }, [client, since7, since30]);
+  }, [client]);
 
   useEffect(() => {
     let cancelled = false;
@@ -501,7 +454,7 @@ export function AnalyticsTool() {
                 ) : (
                   <ul className={styles.list}>
                     {stats.recent.map((row) => (
-                      <li key={row._id} className={styles.listRow}>
+                      <li key={row.id} className={styles.listRow}>
                         <div>
                           <p className={styles.rowTitle}>{row.name || "Unnamed"}</p>
                           <p className={styles.muted}>
