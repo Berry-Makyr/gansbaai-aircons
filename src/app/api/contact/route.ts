@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { createClient } from "next-sanity";
 import { Resend } from "resend";
 import { z } from "zod";
-import { apiVersion, dataset, projectId } from "@/sanity/env";
+import { insertEnquiry, isEnquiriesDbConfigured } from "@/lib/enquiries";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
@@ -14,7 +13,54 @@ const contactSchema = z.object({
     .trim()
     .min(10, "Message must be at least 10 characters")
     .max(5000, "Message is too long"),
+  "bot-field": z.string().optional(),
 });
+
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
+const RATE_LIMIT_MAX = 5;
+
+type RateBucket = { count: number; resetAt: number };
+
+const globalRateStore = globalThis as typeof globalThis & {
+  __contactRateLimit?: Map<string, RateBucket>;
+};
+
+function getRateStore(): Map<string, RateBucket> {
+  if (!globalRateStore.__contactRateLimit) {
+    globalRateStore.__contactRateLimit = new Map();
+  }
+  return globalRateStore.__contactRateLimit;
+}
+
+function getClientIp(request: Request): string {
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) {
+    return forwarded.split(",")[0]?.trim() || "unknown";
+  }
+  return request.headers.get("x-real-ip") || "unknown";
+}
+
+function checkRateLimit(ip: string): { ok: boolean; retryAfterSec: number } {
+  const store = getRateStore();
+  const now = Date.now();
+  const existing = store.get(ip);
+
+  if (!existing || existing.resetAt <= now) {
+    store.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return { ok: true, retryAfterSec: 0 };
+  }
+
+  if (existing.count >= RATE_LIMIT_MAX) {
+    return {
+      ok: false,
+      retryAfterSec: Math.max(1, Math.ceil((existing.resetAt - now) / 1000)),
+    };
+  }
+
+  existing.count += 1;
+  store.set(ip, existing);
+  return { ok: true, retryAfterSec: 0 };
+}
 
 function escapeHtml(value: string): string {
   return value.replace(
@@ -32,11 +78,20 @@ function escapeHtml(value: string): string {
 
 export async function POST(request: Request) {
   try {
-    const writeToken = process.env.SANITY_API_WRITE_TOKEN;
-    if (!writeToken) {
-      console.error(
-        "Contact Form Error: SANITY_API_WRITE_TOKEN is not configured"
+    const ip = getClientIp(request);
+    const rate = checkRateLimit(ip);
+    if (!rate.ok) {
+      return NextResponse.json(
+        { error: "Too many enquiries. Please try again later." },
+        {
+          status: 429,
+          headers: { "Retry-After": String(rate.retryAfterSec) },
+        }
       );
+    }
+
+    if (!isEnquiriesDbConfigured()) {
+      console.error("Contact Form Error: DATABASE_URL is not configured");
       return NextResponse.json(
         {
           error:
@@ -47,6 +102,15 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+
+    // Honeypot: bots fill hidden fields; humans leave them empty.
+    if (
+      typeof body?.["bot-field"] === "string" &&
+      body["bot-field"].trim().length > 0
+    ) {
+      return NextResponse.json({ success: true }, { status: 200 });
+    }
+
     const result = contactSchema.safeParse(body);
 
     if (!result.success) {
@@ -57,18 +121,7 @@ export async function POST(request: Request) {
     }
 
     const { name, email, phone, service, message } = result.data;
-    const sanity = createClient({
-      projectId,
-      dataset,
-      apiVersion,
-      useCdn: false,
-      token: writeToken,
-    });
-
-    await sanity.create({
-      _type: "enquiry",
-      status: "new",
-      submittedAt: new Date().toISOString(),
+    await insertEnquiry({
       name,
       email,
       phone: phone || "",
@@ -82,12 +135,13 @@ export async function POST(request: Request) {
     const safeService = escapeHtml(service);
     const safeMessage = escapeHtml(message).replace(/\n/g, "<br/>");
     const contactEmail =
-      process.env.CONTACT_EMAIL || "admin@gbaircon.co.za";
+      (process.env.CONTACT_EMAIL || "sales@gbaircon.co.za").trim();
     const fromEmail =
-      process.env.CONTACT_FROM_EMAIL ||
-      "Gansbaai Aircon Website <onboarding@resend.dev>";
+      (
+        process.env.CONTACT_FROM_EMAIL ||
+        "Gansbaai Aircon Website <noreply@gbaircon.co.za>"
+      ).trim();
     const apiKey = process.env.RESEND_API_KEY;
-    let emailNotificationSent = false;
 
     if (apiKey) {
       try {
@@ -120,18 +174,13 @@ export async function POST(request: Request) {
 
         if (emailResponse.error) {
           console.warn("Resend notification failed:", emailResponse.error);
-        } else {
-          emailNotificationSent = true;
         }
       } catch (notificationError) {
         console.warn("Resend notification failed:", notificationError);
       }
     }
 
-    return NextResponse.json(
-      { success: true, emailNotificationSent },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("Contact Form Error:", error);
     return NextResponse.json(

@@ -161,6 +161,9 @@ async function main() {
       backgroundImage: heroImage,
       backgroundImageAlt:
         "Gansbaai Aircon technicians servicing commercial air conditioning units",
+      mobileBackgroundImage: heroImage,
+      mobileBackgroundImageAlt:
+        "Gansbaai Aircon technicians servicing commercial air conditioning units",
     },
     { preserveIfExists: true }
   );

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Mail, Phone, MapPin } from "lucide-react";
-import { navLinks } from "@/data/navigation";
+import { enquiryHref, footerExtraLinks, navLinks } from "@/data/navigation";
 import { isPlaceholder } from "@/data/business";
 import type { ServiceContent, SiteSettingsContent } from "@/lib/cms/types";
 import Logo from "@/components/Logo";
@@ -70,10 +70,23 @@ export default function Footer({ siteSettings, services }: FooterProps) {
             <h4 className="text-white font-semibold mb-6">Our Services</h4>
             <ul className="space-y-3">
               {services.slice(0, 6).map((service) => (
-                <li key={service.id} className="text-slate-400">
-                  {service.title}
+                <li key={service.id}>
+                  <Link
+                    href={`/services/${service.id}`}
+                    className="text-slate-400 hover:text-sky-400 transition-colors"
+                  >
+                    {service.title}
+                  </Link>
                 </li>
               ))}
+              <li>
+                <Link
+                  href={enquiryHref()}
+                  className="text-sky-400 hover:text-sky-300 transition-colors font-medium"
+                >
+                  Request a quote
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -127,13 +140,16 @@ export default function Footer({ siteSettings, services }: FooterProps) {
           <p>
             &copy; {currentYear} {siteSettings.shortName}. All rights reserved.
           </p>
-          <div className="flex items-center gap-6">
-            <Link href="#" className="hover:text-slate-300 transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="#" className="hover:text-slate-300 transition-colors">
-              Terms of Service
-            </Link>
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+            {footerExtraLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="hover:text-slate-300 transition-colors"
+              >
+                {link.name}
+              </Link>
+            ))}
           </div>
         </div>
       </div>

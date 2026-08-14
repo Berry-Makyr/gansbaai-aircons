@@ -9,7 +9,11 @@ import { dealersSectionType } from "./dealersSection";
 import { reviewsSectionType } from "./reviewsSection";
 import { serviceType } from "./service";
 import { galleryImageType } from "./galleryImage";
-import { enquiryType } from "./enquiry";
+import { analyticsDayType } from "./analyticsDay";
+import { blockContentType } from "./blockContentType";
+import { categoryType } from "./categoryType";
+import { authorType } from "./authorType";
+import { postType } from "./postType";
 import {
   whyChooseUsItem,
   legacyMilestone,
@@ -28,7 +32,11 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     reviewsSectionType,
     serviceType,
     galleryImageType,
-    enquiryType,
+    analyticsDayType,
+    blockContentType,
+    categoryType,
+    authorType,
+    postType,
     whyChooseUsItem,
     legacyMilestone,
     dealerItem,

@@ -10,6 +10,23 @@ import {
 import type { WhyChooseUsContent } from "@/lib/cms/types";
 import SectionHeading from "@/components/SectionHeading";
 
+const affiliations = [
+  {
+    name: "SARACCA",
+    href: "https://www.saracca.co.za/",
+    src: "/affiliations/saracca.png",
+    width: 200,
+    height: 140,
+  },
+  {
+    name: "SAQCC Gas",
+    href: "https://saqccgas.co.za/",
+    src: "/affiliations/saqcc-gas.svg",
+    width: 200,
+    height: 72,
+  },
+] as const;
+
 const icons = [
   Calendar,
   Users,
@@ -33,9 +50,10 @@ function toBullets(description: string): string[] {
 
 export default function WhyChooseUs({ content }: WhyChooseUsProps) {
   return (
-    <section id="why-us" className="py-24 bg-white" aria-labelledby="why-us-heading">
+    <section id="why-us" className="pt-24 pb-8 bg-white" aria-labelledby="why-us-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
+          id="why-us-heading"
           eyebrow={content.eyebrow}
           title={content.title}
           description={content.description}
@@ -71,6 +89,34 @@ export default function WhyChooseUs({ content }: WhyChooseUsProps) {
               </article>
             );
           })}
+        </div>
+
+        <div className="mt-10 rounded-2xl border border-slate-200 bg-slate-50 px-6 py-6 sm:px-8">
+          <p className="text-center text-sm font-semibold uppercase tracking-wider text-sky-600 mb-2">
+            Qualifications
+          </p>
+          <p className="text-center text-lg sm:text-xl font-bold text-slate-900 mb-5">
+            Fully qualified Refrigeration artisan
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12">
+            {affiliations.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="opacity-90 hover:opacity-100 transition-opacity"
+              >
+                <img
+                  src={item.src}
+                  alt={item.name}
+                  width={item.width}
+                  height={item.height}
+                  className="h-14 sm:h-16 w-auto object-contain"
+                />
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </section>

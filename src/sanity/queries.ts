@@ -41,7 +41,9 @@ export const HOMEPAGE_QUERY = groq`{
     description,
     quoteCtaText,
     backgroundImageAlt,
-    "backgroundImage": backgroundImage ${imageFields}
+    mobileBackgroundImageAlt,
+    "backgroundImage": backgroundImage ${imageFields},
+    "mobileBackgroundImage": mobileBackgroundImage ${imageFields}
   },
   "whyChooseUs": *[_type == "whyChooseUs"][0] {
     eyebrow,
@@ -100,3 +102,44 @@ export const HOMEPAGE_QUERY = groq`{
     "image": image ${imageFields}
   }
 }`;
+
+export const SERVICES_QUERY = groq`*[_type == "service"] | order(order asc) {
+  "id": slug.current,
+  title,
+  description,
+  iconName,
+  order,
+  "iconImage": icon ${imageFields}
+}`;
+
+export const SERVICE_BY_SLUG_QUERY = groq`*[_type == "service" && slug.current == $slug][0] {
+  "id": slug.current,
+  title,
+  description,
+  iconName,
+  order,
+  "iconImage": icon ${imageFields}
+}`;
+
+export const POSTS_QUERY = groq`*[_type == "post" && defined(slug.current) && defined(publishedAt)] | order(publishedAt desc) {
+  "id": _id,
+  title,
+  "slug": slug.current,
+  excerpt,
+  publishedAt,
+  "mainImage": mainImage ${imageFields},
+  "authorName": author->name
+}`;
+
+export const POST_BY_SLUG_QUERY = groq`*[_type == "post" && slug.current == $slug][0] {
+  "id": _id,
+  title,
+  "slug": slug.current,
+  excerpt,
+  publishedAt,
+  body,
+  "mainImage": mainImage ${imageFields},
+  "authorName": author->name
+}`;
+
+export const POST_SLUGS_QUERY = groq`*[_type == "post" && defined(slug.current)]{ "slug": slug.current }`;

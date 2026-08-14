@@ -39,8 +39,18 @@ export const structure: StructureResolver = (S) =>
             ])
         ),
       S.divider(),
-      S.documentTypeListItem("enquiry").title("Website Enquiries"),
-      S.divider(),
       S.documentTypeListItem("service").title("Services"),
       S.documentTypeListItem("galleryImage").title("Gallery Images"),
+      S.divider(),
+      S.listItem()
+        .title("Insights (Blog)")
+        .child(
+          S.list()
+            .title("Insights")
+            .items([
+              S.documentTypeListItem("post").title("Posts"),
+              S.documentTypeListItem("author").title("Authors"),
+              S.documentTypeListItem("category").title("Categories"),
+            ])
+        ),
     ]);

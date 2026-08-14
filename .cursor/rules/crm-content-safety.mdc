@@ -1,0 +1,14 @@
+---
+description: Never lose or hide Sanity CRM media/content on previews or deploys
+alwaysApply: true
+---
+
+# CRM / Sanity content safety
+
+- Sanity Studio is the source of truth for hero, gallery, dealers, community, and other CMS media. Do **not** overwrite Studio documents (including images) unless the user explicitly asks to seed/migrate content.
+- The Sanity dataset stays **private** until production also writes enquiries to Neon. Every Vercel environment that must show live CRM content needs `SANITY_API_WRITE_TOKEN` or `SANITY_API_READ_TOKEN` — including **Preview**. Without it, the site silently falls back to local defaults and looks like CRM images were removed.
+- Do not make the dataset public while the live site still creates Sanity `enquiry` documents.
+- Website enquiries on preview live in Neon (`DATABASE_URL`). Set it on Preview (and local) before sharing a preview that accepts contact forms.
+- When creating preview branches/deployments, verify Preview has the same Sanity project/dataset env vars as Production (and the read token while the dataset is still private) before sharing the link.
+- Never run `npm run seed` / seed scripts against production content unless the user explicitly requests it.
+- Prefer additive code changes. Do not remove Studio image fields, gallery wiring, or CMS merge paths that would discard uploaded media.

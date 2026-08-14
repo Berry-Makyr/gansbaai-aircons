@@ -7,13 +7,32 @@
  * https://github.com/sanity-io/next-sanity
  */
 
-import { NextStudio } from 'next-sanity/studio'
-import config from '../../../../sanity.config'
+import type { Metadata } from "next";
+import { NextStudio } from "next-sanity/studio";
+import {
+  metadata as studioMetadata,
+  viewport,
+} from "next-sanity/studio";
+import config from "../../../../sanity.config";
 
-export const dynamic = 'force-static'
+export const dynamic = "force-static";
 
-export { metadata, viewport } from 'next-sanity/studio'
+export const metadata: Metadata = {
+  ...studioMetadata,
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+    },
+  },
+};
+
+export { viewport };
 
 export default function StudioPage() {
-  return <NextStudio config={config} />
+  return <NextStudio config={config} />;
 }

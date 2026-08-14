@@ -1,5 +1,12 @@
 import { client } from "@/sanity/lib/client";
-import { HOMEPAGE_QUERY } from "@/sanity/queries";
+import {
+  HOMEPAGE_QUERY,
+  POST_BY_SLUG_QUERY,
+  POST_SLUGS_QUERY,
+  POSTS_QUERY,
+  SERVICE_BY_SLUG_QUERY,
+  SERVICES_QUERY,
+} from "@/sanity/queries";
 import { business, isPlaceholder } from "@/data/business";
 import { services as defaultServices } from "@/data/services";
 import { whyChooseUsItems } from "@/data/whyChooseUs";
@@ -53,7 +60,12 @@ type SanityHomepage = {
     seoTitle: string;
     seoDescription: string;
   }>;
-  hero?: Partial<HeroContent & { backgroundImage?: CmsImage }>;
+  hero?: Partial<
+    HeroContent & {
+      backgroundImage?: CmsImage;
+      mobileBackgroundImage?: CmsImage;
+    }
+  >;
   whyChooseUs?: Partial<WhyChooseUsContent>;
   communityOutreach?: Partial<CommunityOutreachContent & {
     featuredImage?: CmsImage;
@@ -142,22 +154,36 @@ function defaultHero(): HeroContent {
     backgroundImage: HERO_IMAGE,
     backgroundImageAlt:
       "Gansbaai Aircon technicians servicing commercial air conditioning units",
+    mobileBackgroundImage: HERO_IMAGE,
+    mobileBackgroundImageAlt:
+      "Gansbaai Aircon technicians servicing commercial air conditioning units",
   };
 }
 
 function mergeHero(data?: SanityHomepage["hero"]): HeroContent {
   const defaults = defaultHero();
   if (!data) return defaults;
+
+  const desktopImage = data.backgroundImage?.url
+    ? data.backgroundImage
+    : defaults.backgroundImage;
+  const desktopAlt =
+    data.backgroundImageAlt ?? defaults.backgroundImageAlt;
+  const mobileImage = data.mobileBackgroundImage?.url
+    ? data.mobileBackgroundImage
+    : desktopImage;
+
   return {
     badgeText: data.badgeText ?? defaults.badgeText,
     headlinePrefix: data.headlinePrefix ?? defaults.headlinePrefix,
     tagline: data.tagline ?? defaults.tagline,
     description: data.description ?? defaults.description,
     quoteCtaText: data.quoteCtaText ?? defaults.quoteCtaText,
-    backgroundImage: data.backgroundImage?.url
-      ? data.backgroundImage
-      : defaults.backgroundImage,
-    backgroundImageAlt: data.backgroundImageAlt ?? defaults.backgroundImageAlt,
+    backgroundImage: desktopImage,
+    backgroundImageAlt: desktopAlt,
+    mobileBackgroundImage: mobileImage,
+    mobileBackgroundImageAlt:
+      data.mobileBackgroundImageAlt || desktopAlt,
   };
 }
 
@@ -325,12 +351,29 @@ function mergeReviews(data?: SanityHomepage["reviewsSection"]): ReviewsSectionCo
   };
 }
 
+function slugifyServiceId(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function resolveServiceId(title?: string, slug?: string): string {
+  const match = defaultServices.find(
+    (service) => service.title.toLowerCase() === title?.trim().toLowerCase()
+  );
+  if (match) return match.id;
+  const candidate = slug || title || "";
+  return slugifyServiceId(candidate);
+}
+
 function mergeServices(data?: SanityHomepage["services"]): ServiceContent[] {
   if (!data?.length) return defaultServices.map((s) => ({ ...s }));
   return data
     .filter((s) => s.title && s.description && s.iconName)
     .map((s) => ({
-      id: s.id ?? s.title!.toLowerCase().replace(/\s+/g, "-"),
+      id: resolveServiceId(s.title, s.id),
       title: s.title!,
       description: s.description!,
       iconName: s.iconName as ServiceContent["iconName"],
@@ -376,7 +419,21 @@ function mergeHomepage(data: SanityHomepage | null): HomepageContent {
   };
 }
 
+function assertSanityReadAuthConfigured() {
+  const hasToken = Boolean(
+    process.env.SANITY_API_READ_TOKEN?.trim() ||
+      process.env.SANITY_API_WRITE_TOKEN?.trim()
+  );
+  if (!hasToken) {
+    console.warn(
+      "[cms] No Sanity read token. Required while the dataset is private — " +
+        "hero/gallery images will fall back to local defaults."
+    );
+  }
+}
+
 export async function getHomepageContent(): Promise<HomepageContent> {
+  assertSanityReadAuthConfigured();
   try {
     const data = await client.fetch<SanityHomepage | null>(
       HOMEPAGE_QUERY,
@@ -386,6 +443,7 @@ export async function getHomepageContent(): Promise<HomepageContent> {
         // Optional Sanity webhook can still purge sooner via /api/revalidate.
         next: {
           revalidate: 60,
+          tags: ["homepage"],
         },
       }
     );
@@ -393,6 +451,103 @@ export async function getHomepageContent(): Promise<HomepageContent> {
   } catch (error) {
     console.error("Failed to fetch Sanity homepage content, using defaults.", error);
     return mergeHomepage(null);
+  }
+}
+
+export async function getServices(): Promise<ServiceContent[]> {
+  try {
+    const data = await client.fetch<SanityHomepage["services"]>(
+      SERVICES_QUERY,
+      {},
+      { next: { revalidate: 60, tags: ["services"] } }
+    );
+    return mergeServices(data);
+  } catch (error) {
+    console.error("Failed to fetch services, using defaults.", error);
+    return mergeServices(undefined);
+  }
+}
+
+export async function getServiceBySlug(
+  slug: string
+): Promise<ServiceContent | null> {
+  try {
+    const data = await client.fetch<
+      (Partial<ServiceContent> & { id?: string }) | null
+    >(
+      SERVICE_BY_SLUG_QUERY,
+      { slug },
+      { next: { revalidate: 60, tags: ["services", `service-${slug}`] } }
+    );
+    const fallback =
+      mergeServices(undefined).find((s) => s.id === slug) ??
+      mergeServices(undefined).find(
+        (s) => slugifyServiceId(s.title) === slugifyServiceId(slug)
+      ) ??
+      null;
+    if (!data?.id && !data?.title) {
+      return fallback;
+    }
+    const merged = mergeServices([data]);
+    return merged[0] ?? fallback;
+  } catch (error) {
+    console.error("Failed to fetch service, using defaults.", error);
+    return mergeServices(undefined).find((s) => s.id === slug) ?? null;
+  }
+}
+
+export type PostListItem = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  publishedAt: string;
+  mainImage?: CmsImage | null;
+  authorName?: string | null;
+};
+
+export type PostDetail = PostListItem & {
+  body: unknown[];
+};
+
+export async function getPosts(): Promise<PostListItem[]> {
+  try {
+    return (
+      (await client.fetch<PostListItem[]>(
+        POSTS_QUERY,
+        {},
+        { next: { revalidate: 60, tags: ["posts"] } }
+      )) ?? []
+    );
+  } catch (error) {
+    console.error("Failed to fetch posts.", error);
+    return [];
+  }
+}
+
+export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
+  try {
+    return await client.fetch<PostDetail | null>(
+      POST_BY_SLUG_QUERY,
+      { slug },
+      { next: { revalidate: 60, tags: ["posts", `post-${slug}`] } }
+    );
+  } catch (error) {
+    console.error("Failed to fetch post.", error);
+    return null;
+  }
+}
+
+export async function getPostSlugs(): Promise<string[]> {
+  try {
+    const rows = await client.fetch<{ slug: string }[]>(
+      POST_SLUGS_QUERY,
+      {},
+      { next: { revalidate: 60, tags: ["posts"] } }
+    );
+    return (rows ?? []).map((row) => row.slug).filter(Boolean);
+  } catch {
+    return [];
   }
 }
 

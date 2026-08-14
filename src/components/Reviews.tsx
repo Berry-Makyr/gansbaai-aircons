@@ -41,6 +41,7 @@ export default function Reviews({ content, siteSettings }: ReviewsProps) {
     <section id="reviews" className="py-24 bg-slate-50" aria-labelledby="reviews-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
+          id="reviews-heading"
           eyebrow={content.eyebrow}
           title={content.title}
           description={content.description}

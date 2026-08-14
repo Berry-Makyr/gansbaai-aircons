@@ -10,8 +10,9 @@ export async function POST(req: NextRequest) {
   try {
     const secret = process.env.SANITY_REVALIDATE_SECRET;
     if (!secret) {
-      return new Response(
-        "Missing environment variable SANITY_REVALIDATE_SECRET",
+      console.error("Missing SANITY_REVALIDATE_SECRET");
+      return NextResponse.json(
+        { error: "Revalidation is not configured." },
         { status: 500 }
       );
     }
@@ -24,11 +25,11 @@ export async function POST(req: NextRequest) {
     );
 
     if (!isValidSignature) {
-      return new Response("Invalid signature", { status: 401 });
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
     if (!body?._type) {
-      return new Response("Bad Request", { status: 400 });
+      return NextResponse.json({ error: "Bad Request" }, { status: 400 });
     }
 
     revalidateTag(body._type, "max");
@@ -36,14 +37,14 @@ export async function POST(req: NextRequest) {
     revalidatePath("/", "layout");
 
     return NextResponse.json({
-      status: 200,
       revalidated: true,
-      now: Date.now(),
-      body,
+      type: body._type,
     });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Unknown error";
     console.error(err);
-    return new Response(message, { status: 500 });
+    return NextResponse.json(
+      { error: "Revalidation failed." },
+      { status: 500 }
+    );
   }
 }

@@ -1,0 +1,247 @@
+.root {
+  height: 100%;
+  overflow: auto;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  color: var(--card-fg-color, inherit);
+  background: var(--card-bg-color, transparent);
+}
+
+.header {
+  margin-bottom: 1.75rem;
+  max-width: 52rem;
+}
+
+.title {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.lede,
+.muted {
+  margin: 0;
+  color: var(--card-muted-fg-color, #6b7280);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  margin: 0 0 0.85rem;
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.statCard,
+.panel,
+.setupCard {
+  border: 1px solid var(--card-border-color, #e5e7eb);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: var(--card-bg-color, transparent);
+}
+
+.statLabel,
+.statHint {
+  margin: 0;
+  color: var(--card-muted-fg-color, #6b7280);
+  font-size: 0.75rem;
+}
+
+.statValue {
+  margin: 0.35rem 0;
+  font-size: 1.75rem;
+  font-weight: 650;
+  line-height: 1.1;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+@media (min-width: 900px) {
+  .split {
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+}
+
+.rangeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.rangeButton {
+  appearance: none;
+  border: 1px solid var(--card-border-color, #e5e7eb);
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.rangeButtonActive {
+  border-color: #2563eb;
+  color: #1d4ed8;
+  background: color-mix(in srgb, #2563eb 10%, transparent);
+}
+
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.35rem;
+  min-height: 8rem;
+  overflow-x: auto;
+  padding-top: 0.5rem;
+}
+
+.barCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  min-width: 1.6rem;
+  flex: 1;
+  height: 8rem;
+}
+
+.bar {
+  width: 100%;
+  max-width: 1.25rem;
+  border-radius: 0.25rem 0.25rem 0 0;
+  background: #2563eb;
+  min-height: 4px;
+}
+
+.barLabel {
+  font-size: 0.65rem;
+  color: var(--card-muted-fg-color, #6b7280);
+  writing-mode: horizontal-tb;
+  white-space: nowrap;
+}
+
+.panelTitle {
+  margin: 0 0 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.listRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.rowTitle {
+  margin: 0 0 0.2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--card-border-color, #e5e7eb);
+  padding: 0.15rem 0.55rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+.status_new {
+  border-color: #d97706;
+  color: #b45309;
+}
+
+.status_contacted {
+  border-color: #2563eb;
+  color: #1d4ed8;
+}
+
+.status_completed {
+  border-color: #059669;
+  color: #047857;
+}
+
+.status_spam {
+  border-color: #dc2626;
+  color: #b91c1c;
+}
+
+.error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.875rem;
+}
+
+.setupCard {
+  background: color-mix(in srgb, #d97706 8%, transparent);
+  border-color: color-mix(in srgb, #d97706 35%, var(--card-border-color, #e5e7eb));
+}
+
+.setupList {
+  margin: 0.75rem 0;
+  padding-left: 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.setupList code {
+  font-size: 0.8em;
+}
+
+.embedFrame {
+  margin-top: 0.75rem;
+  border: 1px solid var(--card-border-color, #e5e7eb);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  min-height: 40rem;
+}
+
+.iframe {
+  display: block;
+  width: 100%;
+  height: 45rem;
+  border: 0;
+}
+
+.field {
+  display: block;
+  width: 100%;
+  margin: 0.35rem 0 0.85rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--card-border-color, #e5e7eb);
+  border-radius: 0.4rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}

@@ -2,21 +2,27 @@ import { MapPin, Navigation, ExternalLink } from "lucide-react";
 import { isPlaceholder } from "@/data/business";
 import type { SiteSettingsContent } from "@/lib/cms/types";
 import SectionHeading from "@/components/SectionHeading";
+import { safeExternalUrl, safeMapsEmbedUrl } from "@/lib/site";
 
 type LocationMapProps = {
   siteSettings: SiteSettingsContent;
 };
 
 export default function LocationMap({ siteSettings }: LocationMapProps) {
-  const { mapsEmbedUrl, mapsDirectionsUrl, mapsOpenUrl } = siteSettings.google;
-  const hasEmbed = !isPlaceholder(mapsEmbedUrl);
-  const hasDirections = !isPlaceholder(mapsDirectionsUrl);
-  const hasOpenUrl = !isPlaceholder(mapsOpenUrl);
+  const mapsEmbedUrl = safeMapsEmbedUrl(siteSettings.google.mapsEmbedUrl);
+  const mapsDirectionsUrl = safeExternalUrl(
+    siteSettings.google.mapsDirectionsUrl
+  );
+  const mapsOpenUrl = safeExternalUrl(siteSettings.google.mapsOpenUrl);
+  const hasEmbed = Boolean(mapsEmbedUrl) && !isPlaceholder(siteSettings.google.mapsEmbedUrl);
+  const hasDirections = Boolean(mapsDirectionsUrl);
+  const hasOpenUrl = Boolean(mapsOpenUrl);
 
   return (
     <section id="location" className="py-24 bg-white" aria-labelledby="location-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
+          id="location-heading"
           eyebrow="Find Us"
           title="Visit Gansbaai Aircon"
           description="Conveniently located to serve Gansbaai and the surrounding Overberg and Overstrand communities."
@@ -26,7 +32,7 @@ export default function LocationMap({ siteSettings }: LocationMapProps) {
           {hasEmbed ? (
             <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9] min-h-[320px] bg-slate-100">
               <iframe
-                src={mapsEmbedUrl}
+                src={mapsEmbedUrl!}
                 title="Gansbaai Aircon location on Google Maps"
                 className="absolute inset-0 w-full h-full border-0"
                 loading="lazy"
@@ -67,7 +73,7 @@ export default function LocationMap({ siteSettings }: LocationMapProps) {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-              {hasDirections ? (
+              {hasDirections && mapsDirectionsUrl ? (
                 <a
                   href={mapsDirectionsUrl}
                   target="_blank"
@@ -82,7 +88,7 @@ export default function LocationMap({ siteSettings }: LocationMapProps) {
                   Directions URL pending
                 </span>
               )}
-              {hasOpenUrl ? (
+              {hasOpenUrl && mapsOpenUrl ? (
                 <a
                   href={mapsOpenUrl}
                   target="_blank"
